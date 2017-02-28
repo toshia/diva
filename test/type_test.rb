@@ -825,6 +825,20 @@ describe 'Type' do
       end
     end
 
+    describe 'Modelの' do
+      before do
+        @mc = Class.new(Diva::Model)
+        @constraint = Diva::Type.array_of(@mc)
+      end
+
+      describe '配列から' do
+        it 'Modelの配列' do
+          expect = [@mc.new({})]
+          assert_equal expect, @constraint.cast(expect)
+        end
+      end
+
+    end
 
   end
 

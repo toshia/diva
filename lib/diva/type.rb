@@ -155,6 +155,7 @@ module Diva::Type
 
   class ArrayType < MetaType
     def initialize(type)
+      type = Diva::Type(type)
       super("#{type.name}_array")
       @type = type
     end
