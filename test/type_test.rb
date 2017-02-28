@@ -517,6 +517,106 @@ describe 'Type' do
   #
   describe 'Model' do
     before do
+      @mk = Diva::Model
+      @constraint = Diva::Type.model_of(@mk)
+    end
+
+    it 'nameが"model"' do
+      assert_equal :model, @constraint.name
+    end
+
+    describe 'キャスト' do
+      it 'intから' do
+        assert_raises(Diva::InvalidTypeError) do
+          @constraint.cast(39)
+        end
+      end
+
+      it 'floatから' do
+        assert_raises(Diva::InvalidTypeError) do
+          @constraint.cast(39.25)
+        end
+      end
+
+      describe 'boolから' do
+        it 'true' do
+          assert_raises(Diva::InvalidTypeError) do
+            @constraint.cast(true)
+          end
+        end
+        it 'false' do
+          assert_raises(Diva::InvalidTypeError) do
+            @constraint.cast(false)
+          end
+        end
+      end
+
+      describe 'stringから' do
+        it '"39"を' do
+          assert_raises(Diva::InvalidTypeError) do
+            @constraint.cast("39")
+          end
+        end
+        it '"abc"を' do
+          assert_raises(Diva::InvalidTypeError) do
+            @constraint.cast("abc")
+          end
+        end
+      end
+
+      it 'Timeから' do
+        time = Time.new(2009, 12, 25)
+        assert_raises(Diva::InvalidTypeError) do
+          @constraint.cast(time)
+        end
+      end
+
+      it 'URI::Genericから' do
+        uri = URI.parse('http://mikutter.hachune.net/')
+        assert_raises(Diva::InvalidTypeError) do
+          @constraint.cast(uri)
+        end
+      end
+
+      it 'Diva::URIから' do
+        uri = Diva::URI.new('http://mikutter.hachune.net/')
+        assert_raises(Diva::InvalidTypeError) do
+          @constraint.cast(uri)
+        end
+      end
+
+      it 'Addressable::URIから' do
+        uri = Addressable::URI.parse('http://mikutter.hachune.net/')
+        assert_raises(Diva::InvalidTypeError) do
+          @constraint.cast(uri)
+        end
+      end
+
+      describe 'Modelから' do
+        it '正しいModel' do
+          mi = @mk.new({})
+          assert_equal mi, @constraint.cast(mi)
+        end
+
+        it 'Modelのサブクラス' do
+          mi = Class.new(Diva::Model).new({})
+          assert_equal mi, @constraint.cast(mi)
+        end
+      end
+
+      it '配列から' do
+        assert_raises(Diva::InvalidTypeError) do
+          @constraint.cast(['156'])
+        end
+      end
+    end
+  end
+
+  #
+  # Modelのサブクラス
+  #
+  describe 'Modelのサブクラス' do
+    before do
       @mk = Class.new(Diva::Model)
       @constraint = Diva::Type.model_of(@mk)
     end

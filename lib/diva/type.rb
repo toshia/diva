@@ -207,10 +207,12 @@ module Diva
       Diva::Type::TIME
     when :uri
       Diva::Type::URI
-    when ->x{x.superclass == Diva::Model}
+    when ->x{x.class == Class && x.ancestors.include?(Diva::Model) }
       Diva::Type.model_of(type)
     when Array
       Diva::Type.array_of(type.first)
+    else
+      fail "Invalid type #{type.inspect} (#{type.class})."
     end
   end
 end

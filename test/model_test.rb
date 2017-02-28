@@ -70,7 +70,7 @@ describe 'Model' do
 
     end
 
-    describe 'model type' do
+    describe 'model type (subclass)' do
       before do
         @child_k = Class.new(Diva::Model)
         @child = @child_k.new({})
@@ -125,9 +125,9 @@ describe 'Model' do
         end
 
         it 'Model へ更新しようとすると、そのインスタンスがそのまま格納される' do
-          assert_raises(Diva::InvalidTypeError) do
-            @mk.new(child: 42)
-          end
+          newval = @child_k.new({})
+          mi2 = @mk.new(child: newval)
+          assert_equal newval, mi2.child
         end
 
         it '[39, 42] (intの配列) へ更新しようとすると、 Diva::InvalidTypeError 例外を投げる' do
@@ -144,6 +144,82 @@ describe 'Model' do
         end
       end
     end
+
+    describe 'model type' do
+      before do
+        @child_k = Class.new(Diva::Model)
+        @child = @child_k.new({})
+        @mk.add_field(:child, type: Diva::Model)
+        @mi = @mk.new(child: @child)
+      end
+
+      it 'Accessorの定義' do
+        assert_respond_to @mi, :child, 'Reader does not defined.'
+        assert_respond_to @mi, :child?, 'Reader does not defined.'
+        assert_respond_to @mi, :child=, 'Writer does not defined.'
+      end
+
+      it '値を読み取る' do
+        assert_equal @child, @mi.child
+      end
+
+      it '値の存在確認をする' do
+        assert @mi.child?, 'childは真値なので#child?はtrueを返す'
+      end
+
+      describe '値を更新する' do
+        it '39 へ更新すると、 Diva::InvalidTypeError 例外を投げる' do
+          assert_raises(Diva::InvalidTypeError) do
+            @mi.child = 39
+          end
+        end
+
+        it '39.25 へ更新すると、 Diva::InvalidTypeError 例外を投げる' do
+          assert_raises(Diva::InvalidTypeError) do
+            @mi.child = 39.25
+          end
+        end
+
+        it '"39" へ更新すると、 Diva::InvalidTypeError 例外を投げる' do
+          assert_raises(Diva::InvalidTypeError) do
+            @mi.child = "39"
+          end
+        end
+
+        it '"abc" へ更新すると、 Diva::InvalidTypeError 例外を投げる' do
+          assert_raises(Diva::InvalidTypeError) do
+            @mi.child = "abc"
+          end
+        end
+
+        it 'Time へ更新すると、 Diva::InvalidTypeError 例外を投げる' do
+          assert_raises(Diva::InvalidTypeError) do
+            time = Time.new(2009, 12, 25)
+            @mi.child = time
+          end
+        end
+
+        it 'Model へ更新しようとすると、そのインスタンスがそのまま格納される' do
+          newval = @child_k.new({})
+          mi2 = @mk.new(child: newval)
+          assert_equal newval, mi2.child
+        end
+
+        it '[39, 42] (intの配列) へ更新しようとすると、 Diva::InvalidTypeError 例外を投げる' do
+          assert_raises(Diva::InvalidTypeError) do
+            @mi.child = [39, 42]
+          end
+        end
+
+        it 'Modelの配列へ更新しようとすると、 Diva::InvalidTypeError 例外を投げる' do
+          mc = @mk.new(child: nil)
+          assert_raises(Diva::InvalidTypeError) do
+            @mi.child = [mc]
+          end
+        end
+      end
+    end
+
   end
 
   describe 'URI' do
