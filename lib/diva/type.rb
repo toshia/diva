@@ -166,7 +166,7 @@ module Diva::Type
     end
 
     def to_s
-      "Array of #{type.to_s}"
+      "Array of #{@type.to_s}"
     end
   end
 
@@ -185,7 +185,7 @@ module Diva::Type
     end
 
     def to_s
-      "#{type.to_s}|nil"
+      "#{@type.to_s}|nil"
     end
   end
 
