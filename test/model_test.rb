@@ -68,6 +68,10 @@ describe 'Model' do
         end
       end
 
+      it 'inspect' do
+        assert_instance_of String, @mk.fields.inspect
+      end
+
     end
 
     describe 'model type (subclass)' do
