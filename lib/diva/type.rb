@@ -144,8 +144,14 @@ module Diva::Type
     end
 
     def cast(value)
-      raise Diva::InvalidTypeError, "The value is not a `#{model}'." unless value.is_a?(model)
-      value
+      case value
+      when model
+        value
+      when Hash
+        model.new(value)
+      else
+        raise Diva::InvalidTypeError, "The value #{value.inspect} is not a `#{model}'."
+      end
     end
 
     def to_s
