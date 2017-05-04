@@ -517,7 +517,11 @@ describe 'Type' do
   #
   describe 'Model' do
     before do
-      @mk = Diva::Model
+      @mk = Class.new(Diva::Model) do
+        field.string :description
+        field.string :name, required: true
+        field.int :id, required: true
+      end
       @constraint = Diva::Type.model_of(@mk)
     end
 
@@ -594,13 +598,15 @@ describe 'Type' do
 
       describe 'Modelから' do
         it '正しいModel' do
-          mi = @mk.new({})
+          mi = @mk.new({name: '名前', id: 1})
           assert_equal mi, @constraint.cast(mi)
         end
 
         it 'Modelのサブクラス' do
           mi = Class.new(Diva::Model).new({})
-          assert_equal mi, @constraint.cast(mi)
+          assert_raises(Diva::InvalidTypeError) do
+            @constraint.cast(mi)
+          end
         end
       end
 
@@ -608,6 +614,14 @@ describe 'Type' do
         assert_raises(Diva::InvalidTypeError) do
           @constraint.cast(['156'])
         end
+      end
+
+      it 'Hashから' do
+        result = @constraint.cast({name: "名前", id: '42', description: '詳細'})
+        assert_instance_of @mk, result
+        assert_equal '詳細', result.description
+        assert_equal '名前', result.name
+        assert_equal 42, result.id
       end
     end
   end
