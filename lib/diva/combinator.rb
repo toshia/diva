@@ -12,9 +12,12 @@ module Diva::Combinable
     # ==== Return
     # true or false
     def =~(behavior)
-      @a.respond_to?(behavior) && @a.__send__(behavior, @b) || @b.respond_to?(behavior) && @b.__send__(behavior, @a)
+      fail 'Not implement'
     end
-    alias_method :===, :=~
+
+    def ===(behavior)
+      self =~ behavior
+    end
 
     # このCombinatorが持っている値のすべての組み合わせのうち、適切に _behavior_
     # をサポートしている組み合わせについて繰り返すEnumeratorを返す
@@ -24,8 +27,8 @@ module Diva::Combinable
     # [レシーバ, 引数] のペアを列挙するEnumerator
     def enum(behavior)
       Enumerator.new do |yielder|
-        yielder << [@a, @b] if @a.respond_to?(behavior) && @a.__send__(behavior, @b)
-        yielder << [@b, @a] if @b.respond_to?(behavior) && @b.__send__(behavior, @a)
+        yielder << [@a, @b] if a_b(behavior)
+        yielder << [@b, @a] if b_a(behavior)
       end
     end
 
@@ -35,19 +38,43 @@ module Diva::Combinable
       end
       super
     end
-  end
 
-  class EnumerableCombinator < Combinator
-    def =~(behavior)
-      @b.any?{|b| !enum(behavior).empty? }
+    private
+
+    def a_b(behavior)
+      @a.respond_to?(behavior) && @a.__send__(behavior, @b)
     end
 
+    def b_a(behavior)
+      @b.respond_to?(behavior) && @b.__send__(behavior, @a)
+    end
+  end
+
+  class PluralCombinator < Combinator
     def enum(behavior)
       Enumerator.new do |yielder|
         @b.each do |b|
-          (@a | b).enum(behavior).each(&yielder.method(:<<))
+          (b | @a).enum(behavior).each(&yielder.method(:<<))
         end
       end
+    end
+  end
+
+  class SingleCombinator < Combinator
+    def =~(behavior)
+      a_b(behavior) || b_a(behavior)
+    end
+  end
+
+  class AnyCombinator < PluralCombinator
+    def =~(behavior)
+      @b.any?{|b| b | @a =~ behavior }
+    end
+  end
+
+  class AllCombinator < PluralCombinator
+    def =~(behavior)
+      @b.all?{|b| b | @a =~ behavior }
     end
   end
 
@@ -58,9 +85,22 @@ module Diva::Combinable
   # Diva::Conbinable::Combinator
   def |(other)
     if other.is_a? Enumerable
-      EnumerableCombinator.new(self, other)
+      AnyCombinator.new(self, other)
     else
-      Combinator.new(self, other)
+      SingleCombinator.new(self, other)
+    end
+  end
+
+  # _other_ との Diva::Conbinable::Combinator を生成する
+  # ==== Args
+  # [other] Diva::Modelか、Diva::Modelを列挙するEnumerable
+  # ==== Return
+  # Diva::Conbinable::Combinator
+  def &(other)
+    if other.is_a? Enumerable
+      AllCombinator.new(self, other)
+    else
+      SingleCombinator.new(self, other)
     end
   end
 end

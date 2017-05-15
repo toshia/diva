@@ -106,6 +106,7 @@ describe 'Combonator' do
       @iub = @mku.new({})
       @ipa = 2.times.map{ @mkp.new(user: @iua) }
       @ipb = 3.times.map{ @mkp.new(user: @iub) }
+      @ipmixed = @ipa + @ipb
       @iaa = @mka.new(user: @iua)
     end
 
@@ -116,8 +117,19 @@ describe 'Combonator' do
       assert_includes (@iaa | @ipa).enum(:deletable?), [@iaa, @ipa[1]]
     end
 
+    it 'should return true all posts are deletable' do
+      assert_match :deletable?, (@iaa | @ipa)
+      assert_match :deletable?, (@iaa & @ipa)
+      refute_match :deletable?, (@iaa | @ipb)
+      refute_match :deletable?, (@iaa & @ipb)
+      assert_match :deletable?, (@iaa | @ipmixed), 'it should return true some posts are myself.'
+      refute_match :deletable?, (@iaa & @ipmixed), 'it should return false some posts aren\'t myself.'
+    end
+
     it 'can\'t delete other post' do
       assert_empty (@iaa | @ipb).enum(:deletable?).to_a
+      refute_match :deletable?, (@iaa | @ipb)
+      refute_match :deletable?, (@iaa & @ipb)
     end
   end
 end
