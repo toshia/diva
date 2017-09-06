@@ -1,8 +1,12 @@
 # Diva
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/diva`. To experiment with that code, run `bin/console` for an interactive prompt.
+This library is an implementation of expression for handling things.
+It replaces Retriever module of mikutter.
 
-TODO: Delete this and the text above, and describe your gem
+Diva::Model is a common interface of all resources handled by mikutter.
+By handling data as a subclass of Diva::Model as necessary,
+you can obtain a common interface and it is useful for cooperation
+among mikutter plugins.
 
 ## Installation
 
