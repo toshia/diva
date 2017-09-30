@@ -85,6 +85,10 @@ class Diva::Model
     Hash[self.class.fields.map{|f| [f.name, fetch(f.name)] }]
   end
 
+  def to_json(*rest, **kwrest)
+    to_hash.to_json(*rest, **kwrest)
+  end
+
   # カラムの生の内容を返す
   def fetch(key)
     @value[key.to_sym]
