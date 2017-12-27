@@ -27,6 +27,8 @@ Diva::Modelのサブクラスであれば、それを制約とすることがで
 配列の全ての要素が設定された制約を満たしていれば、配列制約が満たされたことになる。
 
 =end
+require "time"
+
 module Diva::Type
   extend self
 
@@ -59,6 +61,10 @@ module Diva::Type
 
     def to_s
       name.to_s
+    end
+
+    def dump_for_json(value)
+      value
     end
 
     def inspect
@@ -113,14 +119,19 @@ module Diva::Type
       v.to_s
     end
   end
-  TIME = AtomicType.new(:time) do |v|
+  class TimeType < AtomicType
+    def dump_for_json(value)
+      cast(value).iso8601
+    end
+  end
+  TIME = TimeType.new(:time) do |v|
     case v
     when Time
       v
     when Integer, Float
       Time.at(v)
     when String
-      Time.new(v)
+      Time.iso8601(v)
     else
       raise Diva::InvalidTypeError, "The value is not a `#{name}'."
     end
@@ -171,6 +182,10 @@ module Diva::Type
       value.to_a.map(&@type.method(:cast))
     end
 
+    def dump_for_json(value)
+      value.to_a.map(&@type.method(:dump_for_json))
+    end
+
     def to_s
       "Array of #{@type.to_s}"
     end
@@ -187,6 +202,14 @@ module Diva::Type
         value
       else
         @type.cast(value)
+      end
+    end
+
+    def dump_for_json(value)
+      if value.nil?
+        value
+      else
+        @type.dump_for_json(value)
       end
     end
 

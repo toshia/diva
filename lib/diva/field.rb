@@ -19,6 +19,10 @@ module Diva
       @required = !!required
     end
 
+    def dump_for_json(value)
+      type.dump_for_json(value)
+    end
+
     def required?
       required
     end

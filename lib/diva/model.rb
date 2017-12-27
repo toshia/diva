@@ -86,7 +86,9 @@ class Diva::Model
   end
 
   def to_json(*rest, **kwrest)
-    to_hash.to_json(*rest, **kwrest)
+    Hash[
+      self.class.fields.map{|f| [f.name, f.dump_for_json(fetch(f.name))] }
+    ].to_json(*rest, **kwrest)
   end
 
   # カラムの生の内容を返す
