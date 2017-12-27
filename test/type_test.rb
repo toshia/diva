@@ -370,10 +370,13 @@ describe 'Type' do
 
       describe 'stringから' do
         it '"39"を' do
-          assert_equal Time.new(39), Diva::Type::TIME.cast("39")
+          assert_raises(ArgumentError){ Diva::Type::TIME.cast("39") }
         end
         it '"abc"を' do
-          assert_equal Time.new("abc"), Diva::Type::TIME.cast("abc")
+          assert_raises(ArgumentError){ Diva::Type::TIME.cast("abc") }
+        end
+        it '"2017-12-26T12:46:45+09:00"を' do
+          assert_equal Time.new(2017, 12, 26, 12, 46, 45, '+09:00'), Diva::Type::TIME.cast("2017-12-26T12:46:45+09:00")
         end
       end
 
@@ -415,6 +418,13 @@ describe 'Type' do
         assert_raises(Diva::InvalidTypeError) do
           Diva::Type::TIME.cast(['156'])
         end
+      end
+    end
+
+    describe 'JSONダンプ' do
+      it 'ダンプする' do
+        time = Time.new(2017, 12, 26, 12, 46, 45, '+09:00')
+        assert_equal time.iso8601, Diva::Type::TIME.dump_for_json(time)
       end
     end
   end

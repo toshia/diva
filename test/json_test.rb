@@ -25,6 +25,31 @@ describe 'Model' do
     end
   end
 
+  describe 'Timeキーをもつ' do
+    before do
+      @mk = Class.new(Diva::Model) do
+        field.time :created_at, required: true
+      end
+    end
+
+    it 'iso8601エンコードされた値が得られる' do
+      assert_equal '{"created_at":"2017-12-26T12:46:45+09:00"}', @mk.new(created_at: Time.new(2017, 12, 26, 12, 46, 45, '+09:00')).to_json
+    end
+  end
+
+  describe 'TimeのArrayキーをもつ' do
+    before do
+      @mk = Class.new(Diva::Model) do
+        field.has :timestamps, [:time], required: true
+      end
+    end
+
+    it 'iso8601エンコードされた値の配列が得られる' do
+      assert_equal '{"timestamps":["2017-12-26T12:46:45+09:00"]}', @mk.new(timestamps: [Time.new(2017, 12, 26, 12, 46, 45, '+09:00')]).to_json
+    end
+
+  end
+
   describe 'Modelキーをもつ' do
     before do
       cmk = Class.new(Diva::Model)
