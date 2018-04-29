@@ -119,13 +119,13 @@ class Diva::URI
 
   def generate_uri_by_string
     URI.parse(@uri_string)
-  rescue URI::InvalidComponentError
+  rescue URI::Error
     Addressable::URI.parse(@uri_string)
   end
 
   def generate_uri_by_hash
     URI::Generic.build(@uri_hash)
-  rescue URI::InvalidComponentError
+  rescue URI::Error
     Addressable::URI.new(@uri_hash)
   end
 end
