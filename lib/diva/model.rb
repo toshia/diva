@@ -3,7 +3,6 @@
   いろんなリソースの基底クラス
 =end
 
-require 'diva/combinator'
 require 'diva/model_extend'
 require 'diva/uri'
 require 'diva/spec'
@@ -12,7 +11,6 @@ require 'securerandom'
 
 class Diva::Model
   include Comparable
-  include Diva::Combinable
   extend Diva::ModelExtend
 
   def initialize(args)
