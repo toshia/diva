@@ -12,5 +12,7 @@ require 'diva/version'
 
 
 module Diva
-  # Your code goes here...
+  def self.URI(uri)
+    Diva::URI.new(uri)
+  end
 end
