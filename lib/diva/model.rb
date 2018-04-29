@@ -143,6 +143,16 @@ class Diva::Model
     end
   end
 
+  def dig(key, *args)
+    return nil unless key.respond_to?(:to_sym)
+    value = fetch(key)
+    if value.nil? || args.empty?
+      value
+    else
+      value.dig(*args)
+    end
+  end
+
   private
   # URIがデフォルトで使うpath要素
   def path

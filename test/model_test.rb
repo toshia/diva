@@ -232,4 +232,61 @@ describe 'Model' do
       assert_instance_of Diva::URI, mi.uri
     end
   end
+
+  describe 'dig' do
+    before do
+      @mk.add_field(:field_0, type: :string)
+    end
+
+    it '存在しないフィールドを取得' do
+      @mi = @mk.new({})
+      assert_nil @mi.dig('foobar')
+    end
+
+    it 'Symbolに変換できないフィールドを取得' do
+      refute 0.respond_to?(:to_sym), 'Integer#to_symが実装されているためテストにならない'
+      @mi = @mk.new({})
+      assert_nil @mi.dig(0)
+    end
+
+    it '存在するフィールドを取得' do
+      value = SecureRandom.uuid
+      @mi = @mk.new(field_0: value)
+      assert_equal value, @mi.dig('field_0')
+    end
+
+    describe 'Arrayを含むキー' do
+      before do
+        @mk.add_field(:field_1, type: [:string])
+        @mi = @mk.new(field_1: ['a', 'b', 'c'])
+      end
+
+      it '存在しない要素を取得' do
+        assert_nil @mi.dig('field_1', 100)
+      end
+
+      it '存在する要素を取得' do
+        assert_equal 'a', @mi.dig('field_1', 0)
+        assert_equal 'b', @mi.dig('field_1', 1)
+        assert_equal 'c', @mi.dig('field_1', 2)
+      end
+    end
+
+    describe 'Modelを含むArray' do
+      before do
+        @mi_list = [@mk.new(field_0: 'a'), @mk.new(field_0: 'b'), @mk.new(field_0: 'c')]
+      end
+
+      it '存在しない要素を取得' do
+        assert_nil @mi_list.dig(0, 'foobar')
+      end
+
+      it '存在する要素を取得' do
+        assert_equal 'a', @mi_list.dig(0, 'field_0')
+        assert_equal 'b', @mi_list.dig(1, 'field_0')
+        assert_equal 'c', @mi_list.dig(2, 'field_0')
+      end
+    end
+
+  end
 end
