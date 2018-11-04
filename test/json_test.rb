@@ -75,4 +75,33 @@ describe 'Model' do
 
   end
 
+  describe 'Unionキーを持つ' do
+    describe 'AtomicとTime' do
+      before do
+        @mk = Class.new(Diva::Model) do
+          field.has :union_test, [:bool, :time], required: true
+        end
+      end
+
+      describe 'boolを格納' do
+        it 'boolが得られる' do
+          assert_equal '{"union_test":true}', @mk.new(union_test: true).to_json
+        end
+      end
+
+      describe 'iso8601文字列を格納' do
+        it 'iso8601文字列が得られる' do
+          assert_equal '{"union_test":"2017-12-26T12:46:45+09:00"}', @mk.new(union_test: "2017-12-26T12:46:45+09:00").to_json
+        end
+      end
+
+      describe 'Timeを格納' do
+        it 'iso8601文字列が得られる' do
+          assert_equal '{"union_test":"2017-12-26T12:46:45+09:00"}', @mk.new(union_test: Time.new(2017, 12, 26, 12, 46, 45, '+09:00')).to_json
+        end
+      end
+
+    end
+  end
+
 end

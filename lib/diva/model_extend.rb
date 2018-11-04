@@ -57,6 +57,17 @@ module Diva::ModelExtend
   alias :keys :fields
   deprecate :keys, "fields", 2018, 02
 
+  def schema
+    {
+      fields: fields.map(&:schema),
+      uri: uri
+    }
+  end
+
+  def uri
+    @uri ||= Diva::URI("diva://object.type/#{slug || SecureRandom.uuid}")
+  end
+
   #
   # プライベートクラスメソッド
   #

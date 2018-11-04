@@ -27,6 +27,13 @@ module Diva
       required
     end
 
+    def schema
+      {
+        name: @name.to_s,
+        constraint: @type.schema
+      }
+    end
+
     def to_sym
       name
     end

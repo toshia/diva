@@ -41,14 +41,18 @@ module Diva::Type
   end
 
   def optional(type)
-    OptionalType.new(type)
+    UnionType.new(NULL, type)
+  end
+
+  def union(*types)
+    UnionType.new(*types)
   end
 
   # 全てのType共通のスーパークラス
   class MetaType
     attr_reader :name
 
-    def initialize(name, *rest, &cast)
+    def initialize(name, *, &cast)
       @name = name.to_sym
       if cast
         define_singleton_method :cast, &cast
@@ -73,9 +77,26 @@ module Diva::Type
   end
 
   class AtomicType < MetaType
+    def initialize(name, recommended_class, *rest, &cast)
+      super(name, *rest, &cast)
+      @recommended_classes = Array(recommended_class)
+    end
+
+    def recommendation_point(value)
+      _, point = @recommended_classes.map.with_index{|k, i| [k, i] }.find{|k, _| value.is_a?(k) }
+      point
+    end
+
+    def schema
+      @schema ||= {type: uri}.freeze
+    end
+
+    def uri
+      @uri ||= Diva::URI("diva://atomic.type/#{name}")
+    end
   end
 
-  INT = AtomicType.new(:int) do |v|
+  INT = AtomicType.new(:int, [Integer]) do |v|
     case v
     when Integer
       v
@@ -89,7 +110,7 @@ module Diva::Type
       raise Diva::InvalidTypeError, "The value is not a `#{name}'."
     end
   end
-  FLOAT = AtomicType.new(:float) do |v|
+  FLOAT = AtomicType.new(:float, [Float]) do |v|
     case v
     when Float
       v
@@ -99,7 +120,7 @@ module Diva::Type
       raise Diva::InvalidTypeError, "The value is not a `#{name}'."
     end
   end
-  BOOL = AtomicType.new(:bool) do |v|
+  BOOL = AtomicType.new(:bool, [TrueClass, FalseClass]) do |v|
     case v
     when TrueClass, FalseClass
       v
@@ -111,7 +132,7 @@ module Diva::Type
       raise Diva::InvalidTypeError, "The value is not a `#{name}'."
     end
   end
-  STRING = AtomicType.new(:string) do |v|
+  STRING = AtomicType.new(:string, String) do |v|
     case v
     when Diva::Model, Enumerable
       raise Diva::InvalidTypeError, "The value is not a `#{name}'."
@@ -124,7 +145,7 @@ module Diva::Type
       cast(value).iso8601
     end
   end
-  TIME = TimeType.new(:time) do |v|
+  TIME = TimeType.new(:time, [Time, String]) do |v|
     case v
     when Time
       v
@@ -136,12 +157,19 @@ module Diva::Type
       raise Diva::InvalidTypeError, "The value is not a `#{name}'."
     end
   end
-  URI = AtomicType.new(:uri) do |v|
+  URI = AtomicType.new(:uri, ->v{ [Diva::URI, Addressable::URI, ::URI::Generic].include?(v) }) do |v|
     case v
     when Diva::URI, Addressable::URI, ::URI::Generic
       v
     when String
       Diva::URI.new(v)
+    else
+      raise Diva::InvalidTypeError, "The value is not a `#{name}'."
+    end
+  end
+  NULL = AtomicType.new(:null, NilClass) do |v|
+    if v.nil?
+      v
     else
       raise Diva::InvalidTypeError, "The value is not a `#{name}'."
     end
@@ -152,6 +180,10 @@ module Diva::Type
     def initialize(model, *rest, &cast)
       super(:model, *rest)
       @model = model
+    end
+
+    def recommendation_point(v)
+      v.is_a?(model) && 0
     end
 
     def cast(value)
@@ -165,8 +197,16 @@ module Diva::Type
       end
     end
 
+    def schema
+      @schema ||= {type: uri}.freeze
+    end
+
     def to_s
       "#{model} #{name}"
+    end
+
+    def uri
+      model.uri
     end
   end
 
@@ -175,6 +215,10 @@ module Diva::Type
       type = Diva::Type(type)
       super("#{type.name}_array")
       @type = type
+    end
+
+    def recommendation_point(values)
+      values.is_a?(Enumerable) && values.all?{|v| @type.recommendation_point(v) } && 0
     end
 
     def cast(value)
@@ -189,35 +233,55 @@ module Diva::Type
     def to_s
       "Array of #{@type.to_s}"
     end
+
+    def schema
+      @schema ||= { array: @type.schema }.freeze
+    end
   end
 
-  class OptionalType < MetaType
-    def initialize(type)
-      super("optional_#{type.name}")
-      @type = type
+  class UnionType < MetaType
+    def initialize(*types)
+      @types = types.flatten.map(&Diva.method(:Type)).freeze
+      super("union_#{@types.map(&:name).join('_')}")
+    end
+
+    def recommendation_point(v)
+      @types.map{|t| t.recommendation_point(v) }.compact.min
     end
 
     def cast(value)
-      if value.nil?
-        value
-      else
-        @type.cast(value)
-      end
+      recommended_type_of(value).cast(value)
     end
 
     def dump_for_json(value)
-      if value.nil?
-        value
-      else
-        @type.dump_for_json(value)
-      end
+      recommended_type_of(value).dump_for_json(value)
     end
 
     def to_s
-      "#{@type.to_s}|nil"
+      @types.map(&:name).join('|').freeze
+    end
+
+    def schema
+      @schema ||= { union: @types.map(&:schema) }.freeze
+    end
+
+    def recommended_type_of(value)
+      @types.map{|t|
+        [t, t.recommendation_point(value)]
+      }.select{|_,p| p }.sort_by{|_,p| p }.each{|t,_|
+        return t
+      }
+      @types.each do |type|
+        begin
+          type.cast(value)
+          return type
+        rescue Diva::InvalidTypeError
+          # try next
+        end
+      end
+      raise Diva::InvalidTypeError, "The value is not #{self}"
     end
   end
-
 end
 
 module Diva
@@ -237,10 +301,16 @@ module Diva
       Diva::Type::TIME
     when :uri
       Diva::Type::URI
+    when :null
+      Diva::Type::NULL
     when ->x{x.class == Class && x.ancestors.include?(Diva::Model) }
       Diva::Type.model_of(type)
     when Array
-      Diva::Type.array_of(type.first)
+      if type.size >= 2
+        Diva::Type.union(*type)
+      else
+        Diva::Type.array_of(type.first)
+      end
     else
       fail "Invalid type #{type.inspect} (#{type.class})."
     end
