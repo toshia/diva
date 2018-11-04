@@ -28,6 +28,7 @@ Diva::Modelのサブクラスであれば、それを制約とすることがで
 
 =end
 require "time"
+require 'diva/uri'
 
 module Diva::Type
   extend self
@@ -157,7 +158,7 @@ module Diva::Type
       raise Diva::InvalidTypeError, "The value is not a `#{name}'."
     end
   end
-  URI = AtomicType.new(:uri, ->v{ [Diva::URI, Addressable::URI, ::URI::Generic].include?(v) }) do |v|
+  URI = AtomicType.new(:uri, [Diva::URI, Addressable::URI, ::URI::Generic]) do |v|
     case v
     when Diva::URI, Addressable::URI, ::URI::Generic
       v
