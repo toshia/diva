@@ -96,8 +96,8 @@ class Diva::URI
     super
   end
 
-  def respond_to?(method)
-    super or to_uri.respond_to?(method)
+  def respond_to_missing?(method, include_private)
+    to_uri.respond_to?(method, include_private)
   end
 
   def method_missing(method, *rest, &block)
