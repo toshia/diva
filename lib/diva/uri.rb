@@ -32,6 +32,7 @@ require 'addressable/uri'
 
 class Diva::URI
   def initialize(uri)
+    @uri = @uri_string = @uri_hash = nil
     case uri.freeze
     when URI, Addressable::URI
       @uri = uri
