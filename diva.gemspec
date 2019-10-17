@@ -24,5 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry", '>= 0.12.2', '< 1.0'
   spec.add_development_dependency "simplecov", '>= 0.16.1', '< 1.0'
 
-  spec.add_dependency "addressable", ">= 2.5.2", "< 2.7"
+  spec.add_dependency "addressable", ">= 2.5.2", "< 2.8"
 end
