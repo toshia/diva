@@ -8,6 +8,8 @@ By handling data as a subclass of Diva::Model as necessary,
 you can obtain a common interface and it is useful for cooperation
 among mikutter plugins.
 
+[![toshia](https://circleci.com/gh/toshia/diva.svg?style=svg)](https://circleci.com/gh/toshia/diva)
+
 ## Installation
 
 Add this line to your application's Gemfile:
