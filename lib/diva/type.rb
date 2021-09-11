@@ -184,8 +184,8 @@ module Diva::Type
       @model = model
     end
 
-    def recommendation_point(v)
-      v.is_a?(model) && 0
+    def recommendation_point(value)
+      value.is_a?(model) && 0
     end
 
     def cast(value)
@@ -247,8 +247,8 @@ module Diva::Type
       super("union_#{@types.map(&:name).join('_')}")
     end
 
-    def recommendation_point(v)
-      @types.map { |t| t.recommendation_point(v) }.compact.min
+    def recommendation_point(value)
+      @types.map { |t| t.recommendation_point(value) }.compact.min
     end
 
     def cast(value)
@@ -268,10 +268,12 @@ module Diva::Type
     end
 
     def recommended_type_of(value)
-      @types.map { |t|
+      available_types = @types.map { |t|
         [t, t.recommendation_point(value)]
-      }.select { |_, p| p }.sort_by { |_, p| p }.each do |t, _|
-        return t
+      }.select { |_, p| p }
+      unless available_types.empty?
+        best, = available_types.min_by { |_, p| p }
+        return best
       end
       @types.each do |type|
         type.cast(value)

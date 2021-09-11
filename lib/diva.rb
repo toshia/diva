@@ -9,7 +9,6 @@ require 'diva/model'
 require 'diva/spec'
 require 'diva/type'
 require 'diva/uri'
-require 'diva/version'
 
 module Diva
   def self.URI(uri)

@@ -287,6 +287,12 @@ Layout/SpaceAroundEqualsInParameterDefault:
 Style/BlockComments:
   Enabled: false
 
+Naming/MethodName:
+  EnforcedStyle: snake_case
+  IgnoredPatterns:
+    - URI
+    - Type
+
 Naming/RescuedExceptionsVariableName:
   PreferredName: "exception"
 

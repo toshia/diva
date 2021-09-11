@@ -69,11 +69,11 @@ class Diva::URI
   end
 
   def to_s
-    @uri_string ||= to_uri.to_s.freeze
+    @uri_string ||= to_uri.to_s.freeze # rubocop:disable Naming/MemoizedInstanceVariableName
   end
 
   def to_uri
-    @uri ||= generate_uri.freeze
+    @uri ||= generate_uri.freeze # rubocop:disable Naming/MemoizedInstanceVariableName
   end
 
   def scheme

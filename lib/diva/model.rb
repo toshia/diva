@@ -99,7 +99,6 @@ class Diva::Model
   def []=(key, value)
     @value[key.to_sym] = value
     self.class.store_datum(self)
-    value
   end
 
   # カラムと型が違うものがある場合、例外を発生させる。
