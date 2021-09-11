@@ -24,6 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest", '>= 5.14.4', '< 5.15'
   spec.add_development_dependency "irb", '>= 1.3.7', '< 2.0'
   spec.add_development_dependency "simplecov", '>= 0.17.1', '< 1.0'
-
+  spec.add_development_dependency "rubocop", '>= 1.20.0', '< 1.21.0'
   spec.add_dependency "addressable", ">= 2.5.2", "< 3.0"
 end
