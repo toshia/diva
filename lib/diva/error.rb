@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 module Diva
   class DivaError < StandardError; end
 
@@ -15,5 +16,4 @@ module Diva
 
   # URIとして受け付けられない値を渡された
   class InvalidURIError < InvalidTypeError; end
-
 end

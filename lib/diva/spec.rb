@@ -5,5 +5,5 @@ Diva::ModelSpec = Struct.new(
   :name,
   :reply,
   :myself,
-  :timeline,
+  :timeline
 )

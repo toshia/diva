@@ -29,11 +29,3 @@ class Diva::FieldGenerator
     @model_klass.add_field(field_name, type: type, required: required)
   end
 end
-
-
-
-
-
-
-
-

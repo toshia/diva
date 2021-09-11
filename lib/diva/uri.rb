@@ -46,9 +46,9 @@ class Diva::URI
   def ==(other)
     case other
     when URI, Addressable::URI, String
-      other.to_s == self.to_s
+      other.to_s == to_s
     when Diva::URI
-      if has_string? or other.has_string?
+      if has_string? || other.has_string?
         to_s == other.to_s
       else
         other.to_uri == to_uri
@@ -77,7 +77,7 @@ class Diva::URI
   end
 
   def scheme
-    if has_string? and !has_uri?
+    if has_string? && !has_uri?
       match = @uri_string.match(%r<\A(\w+):>)
       if match
         match[1]

@@ -27,7 +27,7 @@ Diva::Modelのサブクラスであれば、それを制約とすることがで
 配列の全ての要素が設定された制約を満たしていれば、配列制約が満たされたことになる。
 
 =end
-require "time"
+require 'time'
 require 'diva/uri'
 
 module Diva::Type
@@ -73,7 +73,7 @@ module Diva::Type
     end
 
     def inspect
-      "Diva::Type(#{to_s})"
+      "Diva::Type(#{self})"
     end
   end
 
@@ -84,12 +84,12 @@ module Diva::Type
     end
 
     def recommendation_point(value)
-      _, point = @recommended_classes.map.with_index{|k, i| [k, i] }.find{|k, _| value.is_a?(k) }
+      _, point = @recommended_classes.map.with_index { |k, i| [k, i] }.find { |k, _| value.is_a?(k) }
       point
     end
 
     def schema
-      @schema ||= {type: uri}.freeze
+      @schema ||= { type: uri }.freeze
     end
 
     def uri
@@ -169,7 +169,7 @@ module Diva::Type
     end
   end
   NULL = AtomicType.new(:null, NilClass) do |v|
-    if v.nil?
+    if v == nil
       v
     else
       raise Diva::InvalidTypeError, "The value is not a `#{name}'."
@@ -178,6 +178,7 @@ module Diva::Type
 
   class ModelType < MetaType
     attr_reader :model
+
     def initialize(model, *rest, &cast)
       super(:model, *rest)
       @model = model
@@ -199,7 +200,7 @@ module Diva::Type
     end
 
     def schema
-      @schema ||= {type: uri}.freeze
+      @schema ||= { type: uri }.freeze
     end
 
     def to_s
@@ -219,7 +220,7 @@ module Diva::Type
     end
 
     def recommendation_point(values)
-      values.is_a?(Enumerable) && values.all?{|v| @type.recommendation_point(v) } && 0
+      values.is_a?(Enumerable) && values.all? { |v| @type.recommendation_point(v) } && 0
     end
 
     def cast(value)
@@ -232,7 +233,7 @@ module Diva::Type
     end
 
     def to_s
-      "Array of #{@type.to_s}"
+      "Array of #{@type}"
     end
 
     def schema
@@ -247,7 +248,7 @@ module Diva::Type
     end
 
     def recommendation_point(v)
-      @types.map{|t| t.recommendation_point(v) }.compact.min
+      @types.map { |t| t.recommendation_point(v) }.compact.min
     end
 
     def cast(value)
@@ -267,18 +268,16 @@ module Diva::Type
     end
 
     def recommended_type_of(value)
-      @types.map{|t|
+      @types.map { |t|
         [t, t.recommendation_point(value)]
-      }.select{|_,p| p }.sort_by{|_,p| p }.each{|t,_|
+      }.select { |_, p| p }.sort_by { |_, p| p }.each do |t, _|
         return t
-      }
+      end
       @types.each do |type|
-        begin
-          type.cast(value)
-          return type
-        rescue Diva::InvalidTypeError
-          # try next
-        end
+        type.cast(value)
+        return type
+      rescue Diva::InvalidTypeError
+        # try next
       end
       raise Diva::InvalidTypeError, "The value is not #{self}"
     end
@@ -304,7 +303,7 @@ module Diva
       Diva::Type::URI
     when :null
       Diva::Type::NULL
-    when ->x{x.class == Class && x.ancestors.include?(Diva::Model) }
+    when ->(x) { x.instance_of?(Class) && x.ancestors.include?(Diva::Model) }
       Diva::Type.model_of(type)
     when Array
       if type.size >= 2

@@ -15,14 +15,14 @@ module Diva::ModelExtend
   # ==== Return
   # [String] URIスキーム
   def scheme
-    @_scheme ||= self.to_s.split('::',2).first.gsub(/\W/,'').downcase.freeze
+    @_scheme ||= to_s.split('::', 2).first.gsub(/\W/, '').downcase.freeze
   end
 
   # Modelのインスタンスのホスト名。オーバライドして適切な値にする
   # ==== Return
   # [String] ホスト名
   def host
-    @_host ||= self.to_s.split('::',2).last.split('::').reverse.join('.').gsub(/[^\w\.]/,'').downcase.freeze
+    @_host ||= to_s.split('::', 2).last.split('::').reverse.join('.').gsub(/[^\w.]/, '').downcase.freeze
   end
 
   # Modelにフィールドを追加する。
@@ -55,7 +55,7 @@ module Diva::ModelExtend
     @fields ||= []
   end
   alias :keys :fields
-  deprecate :keys, "fields", 2018, 02
+  deprecate :keys, 'fields', 2018, 2
 
   def schema
     {

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 =begin rdoc
   いろんなリソースの基底クラス
 =end
@@ -56,13 +57,13 @@ class Diva::Model
   end
 
   def hash
-    @_hash ||= self.uri.to_s.hash ^ self.class.hash
+    @_hash ||= uri.to_s.hash ^ self.class.hash
   end
 
   def <=>(other)
     if other.is_a?(Diva::Model)
       created - other.created
-    elsif other.respond_to?(:[]) and other[:created]
+    elsif other.respond_to?(:[]) && other[:created]
       created - other[:created]
     else
       id - other
@@ -80,13 +81,11 @@ class Diva::Model
   end
 
   def to_hash
-    Hash[self.class.fields.map{|f| [f.name, fetch(f.name)] }]
+    self.class.fields.to_h { |f| [f.name, fetch(f.name)] }
   end
 
   def to_json(*rest)
-    Hash[
-      self.class.fields.map{|f| [f.name, f.dump_for_json(fetch(f.name))] }
-    ].to_json(*rest)
+    self.class.fields.to_h { |f| [f.name, f.dump_for_json(fetch(f.name))] }.to_json(*rest)
   end
 
   # カラムの生の内容を返す
@@ -105,27 +104,23 @@ class Diva::Model
 
   # カラムと型が違うものがある場合、例外を発生させる。
   def validate
-    raise RuntimeError, "argument is #{@value}, not Hash" if not @value.is_a?(Hash)
+    raise "argument is #{@value}, not Hash" unless @value.is_a?(Hash)
     self.class.fields.each do |field|
-      begin
-        @value[field.name] = field.type.cast(@value[field.name])
-      rescue Diva::InvalidTypeError => err
-        raise Diva::InvalidTypeError, "#{err} in field `#{field}'"
-      end
+      @value[field.name] = field.type.cast(@value[field.name])
+    rescue Diva::InvalidTypeError => exception
+      raise Diva::InvalidTypeError, "#{exception} in field `#{field}'"
     end
   end
 
   # キーとして定義されていない値を全て除外した配列を生成して返す。
   # また、Modelを子に含んでいる場合、それを外部キーに変換する。
   def filtering
-    datum = self.to_hash
-    result = Hash.new
+    datum = to_hash
+    result = {}
     self.class.fields.each do |field|
-      begin
-        result[field.name] = field.type.cast(datum[field.name])
-      rescue Diva::InvalidTypeError => err
-        raise Diva::InvalidTypeError, "#{err} in field `#{field}'"
-      end
+      result[field.name] = field.type.cast(datum[field.name])
+    rescue Diva::InvalidTypeError => exception
+      raise Diva::InvalidTypeError, "#{exception} in field `#{field}'"
     end
     result
   end
@@ -133,10 +128,9 @@ class Diva::Model
   # このインスタンスのタイトル。
   def title
     fields = self.class.fields.lazy.map(&:name)
-    case
-    when fields.include?(:name)
+    if fields.include?(:name)
       name.gsub("\n", '')
-    when fields.include?(:description)
+    elsif fields.include?(:description)
       description.gsub("\n", '')
     else
       to_s.gsub("\n", '')
@@ -146,7 +140,7 @@ class Diva::Model
   def dig(key, *args)
     return nil unless key.respond_to?(:to_sym)
     value = fetch(key)
-    if value.nil? || args.empty?
+    if value == nil || args.empty?
       value
     else
       value.dig(*args)
@@ -154,10 +148,9 @@ class Diva::Model
   end
 
   private
+
   # URIがデフォルトで使うpath要素
   def path
     @path ||= "/#{SecureRandom.uuid}"
   end
-
 end
-

@@ -18,7 +18,8 @@ module Diva::DataSource
 
   # 取得できたらそのDivaのインスタンスをキーにして実行されるDeferredを返す
   def idof(id)
-    Thread.new{ findbyid(id) } end
+    Thread.new { findbyid(id) }
+  end
   alias [] idof
 
   # データの保存
