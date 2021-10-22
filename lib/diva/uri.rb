@@ -60,6 +60,10 @@ class Diva::URI
     to_s.hash ^ self.class.hash
   end
 
+  def eql?(other)
+    self == other
+  end
+
   def has_string?
     !!@uri_string
   end

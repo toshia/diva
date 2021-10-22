@@ -82,4 +82,24 @@ describe 'URI' do
       end
     end
   end
+
+  describe 'Hashのキー' do
+    before do
+      @uri_text = 'https://mikutter.hachune.net/'
+      @key1 = Diva::URI(@uri_text)
+      @hash = { @key1 => 1 }
+    end
+
+    it '同一インスタンスでクエリ' do
+      assert_equal 1, @hash[@key1]
+    end
+
+    it '同一URIでクエリ' do
+      assert_equal 1, @hash[Diva::URI(@uri_text)]
+    end
+
+    it '異なるURIでクエリ' do
+      refute @hash.key?(Diva::URI('https://social.mikutter.hachune.net/'))
+    end
+  end
 end
