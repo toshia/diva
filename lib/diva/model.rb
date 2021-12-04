@@ -24,7 +24,7 @@ class Diva::Model
   # selfにあってotherにもあるカラムはotherの内容で上書きされる。
   # 上書き後、データはDataSourceに保存される
   def merge(other)
-    @value.update(other.to_hash)
+    @value.update(other.to_h)
     validate
     self.class.store_datum(self)
   end
@@ -80,7 +80,7 @@ class Diva::Model
     self == other
   end
 
-  def to_hash
+  def to_h
     self.class.fields.to_h { |f| [f.name, fetch(f.name)] }
   end
 
@@ -114,7 +114,7 @@ class Diva::Model
   # キーとして定義されていない値を全て除外した配列を生成して返す。
   # また、Modelを子に含んでいる場合、それを外部キーに変換する。
   def filtering
-    datum = to_hash
+    datum = to_h
     result = {}
     self.class.fields.each do |field|
       result[field.name] = field.type.cast(datum[field.name])
