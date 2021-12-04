@@ -146,6 +146,14 @@ class Diva::Model
     end
   end
 
+  def deconstruct_keys(keys)
+    if keys
+      @value.slice(*keys) # 高速化のため、fetchを呼び出していない
+    else
+      @value
+    end
+  end
+
   private
 
   # URIがデフォルトで使うpath要素

@@ -6,7 +6,7 @@ executors:
       tag:
         type: string
     docker:
-      - image: circleci/ruby:<< parameters.tag >>
+      - image: ruby:<< parameters.tag >>
 
 jobs:
   build:
@@ -49,19 +49,19 @@ workflows:
     jobs:
       - lint:
           name: 'lint'
-          ruby-version: '3.0.2'
-      - build:
-          name: 'ruby-2.6'
-          ruby-version: '2.6.7'
-          requires:
-            - 'lint'
+          ruby-version: '3.0.3'
       - build:
           name: 'ruby-2.7'
-          ruby-version: '2.7.4'
+          ruby-version: '2.7.5'
           requires:
             - 'lint'
       - build:
           name: 'ruby-3.0'
-          ruby-version: '3.0.2'
+          ruby-version: '3.0.3'
+          requires:
+            - 'lint'
+      - build:
+          name: 'ruby-3.1'
+          ruby-version: '3.1.0-preview1'
           requires:
             - 'lint'
