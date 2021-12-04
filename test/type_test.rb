@@ -31,10 +31,10 @@ describe 'Type' do
 
       describe 'stringから' do
         it '"39"を' do
-          assert_equal 39, Diva::Type::INT.cast("39")
+          assert_equal 39, Diva::Type::INT.cast('39')
         end
         it '"abc"を' do
-          assert_equal 0, Diva::Type::INT.cast("abc")
+          assert_equal 0, Diva::Type::INT.cast('abc')
         end
       end
 
@@ -113,10 +113,10 @@ describe 'Type' do
 
       describe 'stringから' do
         it '"39"を' do
-          assert_equal 39.0, Diva::Type::FLOAT.cast("39")
+          assert_equal 39.0, Diva::Type::FLOAT.cast('39')
         end
         it '"abc"を' do
-          assert_equal 0.0, Diva::Type::FLOAT.cast("abc")
+          assert_equal 0.0, Diva::Type::FLOAT.cast('abc')
         end
       end
 
@@ -198,25 +198,25 @@ describe 'Type' do
 
       describe 'stringから' do
         it '"39"を' do
-          assert_equal true, Diva::Type::BOOL.cast("39")
+          assert_equal true, Diva::Type::BOOL.cast('39')
         end
         it '"abc"を' do
-          assert_equal true, Diva::Type::BOOL.cast("abc")
+          assert_equal true, Diva::Type::BOOL.cast('abc')
         end
         it '"false"を' do
-          assert_equal true, Diva::Type::BOOL.cast("false")
+          assert_equal true, Diva::Type::BOOL.cast('false')
         end
         it '"nil"を' do
-          assert_equal true, Diva::Type::BOOL.cast("nil")
+          assert_equal true, Diva::Type::BOOL.cast('nil')
         end
         it '"null"を' do
-          assert_equal true, Diva::Type::BOOL.cast("null")
+          assert_equal true, Diva::Type::BOOL.cast('null')
         end
         it '"0"を' do
-          assert_equal true, Diva::Type::BOOL.cast("0")
+          assert_equal true, Diva::Type::BOOL.cast('0')
         end
         it '""を' do
-          assert_equal false, Diva::Type::BOOL.cast("")
+          assert_equal false, Diva::Type::BOOL.cast('')
         end
       end
 
@@ -274,11 +274,11 @@ describe 'Type' do
 
     describe 'キャスト' do
       it 'intから' do
-        assert_equal "39", Diva::Type::STRING.cast(39)
+        assert_equal '39', Diva::Type::STRING.cast(39)
       end
 
       it 'floatから' do
-        assert_equal "39.25", Diva::Type::STRING.cast(39.25)
+        assert_equal '39.25', Diva::Type::STRING.cast(39.25)
       end
 
       describe 'boolから' do
@@ -292,10 +292,10 @@ describe 'Type' do
 
       describe 'stringから' do
         it '"39"を' do
-          assert_equal '39', Diva::Type::STRING.cast("39")
+          assert_equal '39', Diva::Type::STRING.cast('39')
         end
         it '"abc"を' do
-          assert_equal 'abc', Diva::Type::STRING.cast("abc")
+          assert_equal 'abc', Diva::Type::STRING.cast('abc')
         end
       end
 
@@ -370,13 +370,13 @@ describe 'Type' do
 
       describe 'stringから' do
         it '"39"を' do
-          assert_raises(ArgumentError){ Diva::Type::TIME.cast("39") }
+          assert_raises(ArgumentError) { Diva::Type::TIME.cast('39') }
         end
         it '"abc"を' do
-          assert_raises(ArgumentError){ Diva::Type::TIME.cast("abc") }
+          assert_raises(ArgumentError) { Diva::Type::TIME.cast('abc') }
         end
         it '"2017-12-26T12:46:45+09:00"を' do
-          assert_equal Time.new(2017, 12, 26, 12, 46, 45, '+09:00'), Diva::Type::TIME.cast("2017-12-26T12:46:45+09:00")
+          assert_equal Time.new(2017, 12, 26, 12, 46, 45, '+09:00'), Diva::Type::TIME.cast('2017-12-26T12:46:45+09:00')
         end
       end
 
@@ -465,19 +465,19 @@ describe 'Type' do
 
       describe 'stringから' do
         it '"39"を' do
-          uri = Diva::Type::URI.cast("39")
+          uri = Diva::Type::URI.cast('39')
           assert_equal '39', uri.to_s
           assert_kind_of Diva::URI, uri
           assert_nil uri.scheme
         end
         it '"abc"を' do
-          uri = Diva::Type::URI.cast("abc")
+          uri = Diva::Type::URI.cast('abc')
           assert_equal 'abc', uri.to_s
           assert_kind_of Diva::URI, uri
           assert_nil uri.scheme
         end
         it '"http://mikutter.hachune.net/"を' do
-          uri = Diva::Type::URI.cast("http://mikutter.hachune.net/")
+          uri = Diva::Type::URI.cast('http://mikutter.hachune.net/')
           assert_equal 'http://mikutter.hachune.net/', uri.to_s
           assert_kind_of Diva::URI, uri
           assert_equal 'http', uri.scheme
@@ -568,12 +568,12 @@ describe 'Type' do
       describe 'stringから' do
         it '"39"を' do
           assert_raises(Diva::InvalidTypeError) do
-            @constraint.cast("39")
+            @constraint.cast('39')
           end
         end
         it '"abc"を' do
           assert_raises(Diva::InvalidTypeError) do
-            @constraint.cast("abc")
+            @constraint.cast('abc')
           end
         end
       end
@@ -608,7 +608,7 @@ describe 'Type' do
 
       describe 'Modelから' do
         it '正しいModel' do
-          mi = @mk.new({name: '名前', id: 1})
+          mi = @mk.new({ name: '名前', id: 1 })
           assert_equal mi, @constraint.cast(mi)
         end
 
@@ -627,7 +627,7 @@ describe 'Type' do
       end
 
       it 'Hashから' do
-        result = @constraint.cast({name: "名前", id: '42', description: '詳細'})
+        result = @constraint.cast({ name: '名前', id: '42', description: '詳細' })
         assert_instance_of @mk, result
         assert_equal '詳細', result.description
         assert_equal '名前', result.name
@@ -678,12 +678,12 @@ describe 'Type' do
       describe 'stringから' do
         it '"39"を' do
           assert_raises(Diva::InvalidTypeError) do
-            @constraint.cast("39")
+            @constraint.cast('39')
           end
         end
         it '"abc"を' do
           assert_raises(Diva::InvalidTypeError) do
-            @constraint.cast("abc")
+            @constraint.cast('abc')
           end
         end
       end
@@ -776,12 +776,12 @@ describe 'Type' do
         describe 'stringから' do
           it '"39"を' do
             assert_raises(Diva::InvalidTypeError) do
-              @constraint.cast("39")
+              @constraint.cast('39')
             end
           end
           it '"abc"を' do
             assert_raises(Diva::InvalidTypeError) do
-              @constraint.cast("abc")
+              @constraint.cast('abc')
             end
           end
         end
@@ -861,7 +861,6 @@ describe 'Type' do
           assert_equal expect, @constraint.cast(expect)
         end
       end
-
     end
 
     describe 'Union' do
@@ -875,7 +874,7 @@ describe 'Type' do
         end
 
         it 'floatから' do
-          assert_equal "39.25", @constraint.cast(39.25)
+          assert_equal '39.25', @constraint.cast(39.25)
         end
 
         describe 'boolから' do
@@ -889,10 +888,10 @@ describe 'Type' do
 
         describe 'stringから' do
           it '"39"を' do
-            assert_equal '39', @constraint.cast("39")
+            assert_equal '39', @constraint.cast('39')
           end
           it '"abc"を' do
-            assert_equal 'abc', @constraint.cast("abc")
+            assert_equal 'abc', @constraint.cast('abc')
           end
         end
 
@@ -934,7 +933,5 @@ describe 'Type' do
         end
       end
     end
-
   end
-
 end

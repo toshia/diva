@@ -40,13 +40,13 @@ describe 'Model' do
         end
 
         it '"39" へ更新すると、to_iされた値が格納される' do
-          @mi.field_0 = "39"
-          assert_equal "39".to_i, @mi.field_0
+          @mi.field_0 = '39'
+          assert_equal '39'.to_i, @mi.field_0
         end
 
         it '"abc" へ更新すると、to_iされた値が格納される' do
-          @mi.field_0 = "abc"
-          assert_equal "abc".to_i, @mi.field_0
+          @mi.field_0 = 'abc'
+          assert_equal 'abc'.to_i, @mi.field_0
         end
 
         it 'Time へ更新すると、 Diva::InvalidTypeError 例外を投げる' do
@@ -71,7 +71,6 @@ describe 'Model' do
       it 'inspect' do
         assert_instance_of String, @mk.fields.inspect
       end
-
     end
 
     describe 'model type (subclass)' do
@@ -111,13 +110,13 @@ describe 'Model' do
 
         it '"39" へ更新すると、 Diva::InvalidTypeError 例外を投げる' do
           assert_raises(Diva::InvalidTypeError) do
-            @mi.child = "39"
+            @mi.child = '39'
           end
         end
 
         it '"abc" へ更新すると、 Diva::InvalidTypeError 例外を投げる' do
           assert_raises(Diva::InvalidTypeError) do
-            @mi.child = "abc"
+            @mi.child = 'abc'
           end
         end
 
@@ -186,13 +185,13 @@ describe 'Model' do
 
         it '"39" へ更新すると、 Diva::InvalidTypeError 例外を投げる' do
           assert_raises(Diva::InvalidTypeError) do
-            @mi.child = "39"
+            @mi.child = '39'
           end
         end
 
         it '"abc" へ更新すると、 Diva::InvalidTypeError 例外を投げる' do
           assert_raises(Diva::InvalidTypeError) do
-            @mi.child = "abc"
+            @mi.child = 'abc'
           end
         end
 
@@ -223,7 +222,6 @@ describe 'Model' do
         end
       end
     end
-
   end
 
   describe 'URI' do
@@ -240,19 +238,19 @@ describe 'Model' do
 
     it '存在しないフィールドを取得' do
       @mi = @mk.new({})
-      assert_nil @mi.dig('foobar')
+      assert_nil @mi.dig('foobar') # rubocop:disable Style/SingleArgumentDig
     end
 
     it 'Symbolに変換できないフィールドを取得' do
       refute 0.respond_to?(:to_sym), 'Integer#to_symが実装されているためテストにならない'
       @mi = @mk.new({})
-      assert_nil @mi.dig(0)
+      assert_nil @mi.dig(0) # rubocop:disable Style/SingleArgumentDig
     end
 
     it '存在するフィールドを取得' do
       value = SecureRandom.uuid
       @mi = @mk.new(field_0: value)
-      assert_equal value, @mi.dig('field_0')
+      assert_equal value, @mi.dig('field_0') # rubocop:disable Style/SingleArgumentDig
     end
 
     describe 'Arrayを含むキー' do
@@ -287,6 +285,5 @@ describe 'Model' do
         assert_equal 'c', @mi_list.dig(2, 'field_0')
       end
     end
-
   end
 end

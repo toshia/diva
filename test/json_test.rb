@@ -47,7 +47,6 @@ describe 'Model' do
     it 'iso8601エンコードされた値の配列が得られる' do
       assert_equal '{"timestamps":["2017-12-26T12:46:45+09:00"]}', @mk.new(timestamps: [Time.new(2017, 12, 26, 12, 46, 45, '+09:00')]).to_json
     end
-
   end
 
   describe 'Modelキーをもつ' do
@@ -58,7 +57,7 @@ describe 'Model' do
       end
     end
     it '{"child":{}}が得られる' do
-      assert_equal '{"child":{}}', @mk.new(child:{}).to_json
+      assert_equal '{"child":{}}', @mk.new(child: {}).to_json
     end
   end
 
@@ -70,16 +69,15 @@ describe 'Model' do
     end
 
     it '{"ids":[1,2,3]}が得られる' do
-      assert_equal '{"ids":[1,2,3]}', @mk.new(ids: [1,2,3]).to_json
+      assert_equal '{"ids":[1,2,3]}', @mk.new(ids: [1, 2, 3]).to_json
     end
-
   end
 
   describe 'Unionキーを持つ' do
     describe 'AtomicとTime' do
       before do
         @mk = Class.new(Diva::Model) do
-          field.has :union_test, [:bool, :time], required: true
+          field.has :union_test, %i[bool time], required: true
         end
       end
 
@@ -91,7 +89,7 @@ describe 'Model' do
 
       describe 'iso8601文字列を格納' do
         it 'iso8601文字列が得られる' do
-          assert_equal '{"union_test":"2017-12-26T12:46:45+09:00"}', @mk.new(union_test: "2017-12-26T12:46:45+09:00").to_json
+          assert_equal '{"union_test":"2017-12-26T12:46:45+09:00"}', @mk.new(union_test: '2017-12-26T12:46:45+09:00').to_json
         end
       end
 
@@ -100,8 +98,6 @@ describe 'Model' do
           assert_equal '{"union_test":"2017-12-26T12:46:45+09:00"}', @mk.new(union_test: Time.new(2017, 12, 26, 12, 46, 45, '+09:00')).to_json
         end
       end
-
     end
   end
-
 end

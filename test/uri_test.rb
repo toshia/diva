@@ -99,7 +99,7 @@ describe 'URI' do
     end
 
     it '異なるURIでクエリ' do
-      refute @hash.key?(Diva::URI('https://social.mikutter.hachune.net/'))
+      refute @hash.has_key?(Diva::URI('https://social.mikutter.hachune.net/'))
     end
   end
 end
