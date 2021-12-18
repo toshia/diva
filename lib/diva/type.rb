@@ -153,7 +153,11 @@ module Diva::Type
     when Integer, Float
       Time.at(v)
     when String
-      Time.iso8601(v)
+      begin
+        Time.iso8601(v)
+      rescue StandardError
+        Time.parse(v)
+      end
     else
       raise Diva::InvalidTypeError, "The value is not a `#{name}'."
     end
