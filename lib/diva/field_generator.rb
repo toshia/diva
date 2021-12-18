@@ -9,6 +9,10 @@ class Diva::FieldGenerator
     @model_klass.add_field(field_name, type: :int, required: required)
   end
 
+  def float(field_name, required: false)
+    @model_klass.add_field(field_name, type: :float, required: required)
+  end
+
   def string(field_name, required: false)
     @model_klass.add_field(field_name, type: :string, required: required)
   end
