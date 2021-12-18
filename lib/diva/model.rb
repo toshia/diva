@@ -106,8 +106,8 @@ class Diva::Model
     raise "argument is #{@value}, not Hash" unless @value.is_a?(Hash)
     self.class.fields.each do |field|
       @value[field.name] = field.type.cast(@value[field.name])
-    rescue Diva::InvalidTypeError => exception
-      raise Diva::InvalidTypeError, "#{exception} in field `#{field}'"
+    rescue Diva::InvalidTypeError
+      raise Diva::InvalidTypeError, "#{self.class}.#{field} (#{field.type}): Invalid assign #{@value[field.name].inspect}:#{@value[field.name].class}"
     end
   end
 
